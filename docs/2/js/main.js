@@ -26,6 +26,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         console.log(name.v)
         a.t(''===name.v)
         a.e(TypeError, `'name' is immutable.`, ()=>name.v = 'Suzuki') // 値は変更不可(mutable:falseのため)
+        a.e(TypeError, `'name' is immutable.`, ()=>name.v = null) // 値は変更不可(mutable:falseのため)
     })();
     ;(function(){
         const name = new Field('name', 'String', 'Yamada')
@@ -40,10 +41,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t('String'===name.t)
         a.t('Yamada'===name.v)
         a.e(TypeError, `'name' is immutable.`, ()=>name.v = 'Suzuki') // 値は変更不可(mutable:falseのため)
+        a.e(TypeError, `'name' is immutable.`, ()=>name.v = null) // 値は変更不可(mutable:falseのため)
     })();
     ;(function(){
         const name = new Field('name', 'String', 'Yamada', true) // nullable
-        /*
         a.t('n' in name)
         a.t('t' in name)
         a.t('v' in name)
@@ -54,11 +55,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t('name'===name.n)
         a.t('String'===name.t)
         a.t('Yamada'===name.v)
-        name.v = 'Suzuki'
-        a.t('Suzuki'===name.v) // 値は変更可(mutable:trueのため)
-        */
+//        name.v = null
+//        a.t(null===name.v) // 値は変更可(mutable:trueのため)
+        a.e(TypeError, `'name' is immutable.`, ()=>name.v = 'Suzuki') // 値は変更不可(mutable:falseのため)
+        a.e(TypeError, `'name' is immutable.`, ()=>name.v = null) // 値は変更不可(mutable:falseのため)
     })();
-    /*
     ;(function(){
         const name = new Field('name', 'String', 'Yamada', false, true) // mutable
         a.t('n' in name)
@@ -73,37 +74,39 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t('Yamada'===name.v)
         name.v = 'Suzuki'
         a.t('Suzuki'===name.v) // 値は変更可(mutable:trueのため)
+        a.e(TypeError, `'name' is not nullable.`, ()=>name.v = null) // 値は変更不可(mutable:falseのため)
+        a.t('Suzuki'===name.v) // 値は変更可(mutable:trueのため)
+    })();
+    ;(function(){
+         // nullable:falseなのにnullをセットしようとした
+        a.e(TypeError, `'name' is not nullable.`, ()=>new Field('name', 'String', null))
     })();
     ;(function(){
         const name = new Field('name', 'String', '', false, true) // nullable:falseなのにnullをセットしようとした
         a.e(TypeError, `'name' is not nullable.`, ()=>name.v = null)
     })();
-
     ;(function(){
-        const name = new Field('name', 'String', 'Yamada')
-        //a.t(Type.isIns(name, Field))
-        //a.t(Type.isProxy(name, Field))
-        a.t(name instanceof Field)
-        //a.t(name instanceof Proxy)
-        console.log(name)
-        console.log(Object.getOwnPropertyNames(name))
-        a.t('name'===name.n)
-        a.t('String'===name.t)
-        a.t('Yamada'===name.v)
-        a.e(TypeError, `'name' is immutable.`, ()=>name.v = 'Suzuki')
+        const name = new Field('name', 'String', null, true)
+        a.t(null===name.v)
     })();
     ;(function(){
-        const name = new Field('name', 'String', 'Yamada', true)
-        a.t(Type.isIns(name, Field))
-        console.log(name)
-        console.log(Object.getOwnPropertyNames(name))
+        const name = new Field('name', 'String', null, true, true) // nullable, mutable
+        a.t('n' in name)
+        a.t('t' in name)
+        a.t('v' in name)
+        a.e(TypeError, `Read only.`, ()=>name.n = 'x') // 名は変更不可
+        a.e(TypeError, `Read only.`, ()=>name.t = 'x') // 型は変更不可
+        a.e(TypeError, `Read only.`, ()=>name.x = 'x') // 新しいプロパティを追加することはできない。
+        a.f('x' in name) 
         a.t('name'===name.n)
         a.t('String'===name.t)
-        a.t('Yamada'===name.v)
+        a.t(null===name.v)
         name.v = 'Suzuki'
-        a.t('Suzuki'===name.v)
+        a.t('Suzuki'===name.v) // 値は変更可(mutable:trueのため)
+        name.v = null
+        a.t(null===name.v) // 値は変更可(mutable:trueのため)
     })();
-    */
+
     a.fin()
 });
 window.addEventListener('beforeunload', (event) => {

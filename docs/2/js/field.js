@@ -29,7 +29,11 @@ class Field { // undefinedは絶対代入させない。null,代入は許可制�
     get v() { return this.#v }
     set v(v) {
         if (this.#_.mutable) {
-            if (null===v && !this.#_.nullable) {throw new TypeError(`'${this.#_.name}' is not nullable.`)}
+            //if (null===v && !this.#_.nullable) {throw new TypeError(`'${this.#_.name}' is not nullable.`)}
+            if (null===v) {
+                if (this.#_.nullable){this.#v=v}
+                else{throw new TypeError(`'${this.#_.name}' is not nullable.`)}
+            }
             else if (!Type[`is${this.#_.type}`](v)){throw new TypeError(`Invalid type.`)}
             else {this.#v = v}
         } else {throw new TypeError(`'${this.#_.name}' is immutable.`)}
@@ -50,10 +54,14 @@ class Field { // undefinedは絶対代入させない。null,代入は許可制�
     #validType(type) { return Field.#NAMES.includes(type) }
 //    #validValue(value, type) { return Type.isCls(type) ? value instanceof type : Type[`is${type}`](value)}
     #validValue(value, type) {
-        if (null===value && this.#_.nullable) { return true }
-        else {
+        //if (null===value && this.#_.nullable) { return true }
+        if (null===value) {
+            if (this.#_.nullable) {return true}
+            else {throw new TypeError(`'${this.#_.name}' is not nullable.`)}
+        } else {
             const mNm = `is${type}`
-            console.log(this.#_, value, type, mNm, mNm in Type, Type[mNm](value))
+//            console.log(this.#_, value, type, mNm, mNm in Type, Type[mNm](value))
+//            this.v = value
             if (mNm in Type) {return Type[mNm](value)}
             else {return value instanceof new Function(`return ${type}`)()}
         }
