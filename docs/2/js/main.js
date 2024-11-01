@@ -13,6 +13,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
     a.t(Type.isCls(Field))
     a.t(Type.isStrs(Field.NAMES))
     ;(function(){
+        const name = new Field('name', 'String')
+        a.t('n' in name)
+        a.t('t' in name)
+        a.t('v' in name)
+        a.e(TypeError, `Read only.`, ()=>name.n = 'x') // 名は変更不可
+        a.e(TypeError, `Read only.`, ()=>name.t = 'x') // 型は変更不可
+        a.e(TypeError, `Read only.`, ()=>name.x = 'x') // 新しいプロパティを追加することはできない。
+        a.f('x' in name) 
+        a.t('name'===name.n)
+        a.t('String'===name.t)
+        console.log(name.v)
+        a.t(''===name.v)
+        a.e(TypeError, `'name' is immutable.`, ()=>name.v = 'Suzuki') // 値は変更不可(mutable:falseのため)
+    })();
+    ;(function(){
         const name = new Field('name', 'String', 'Yamada')
         a.t('n' in name)
         a.t('t' in name)
@@ -27,7 +42,25 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.e(TypeError, `'name' is immutable.`, ()=>name.v = 'Suzuki') // 値は変更不可(mutable:falseのため)
     })();
     ;(function(){
-        const name = new Field('name', 'String', 'Yamada', true)
+        const name = new Field('name', 'String', 'Yamada', true) // nullable
+        /*
+        a.t('n' in name)
+        a.t('t' in name)
+        a.t('v' in name)
+        a.e(TypeError, `Read only.`, ()=>name.n = 'x') // 名は変更不可
+        a.e(TypeError, `Read only.`, ()=>name.t = 'x') // 型は変更不可
+        a.e(TypeError, `Read only.`, ()=>name.x = 'x') // 新しいプロパティを追加することはできない。
+        a.f('x' in name) 
+        a.t('name'===name.n)
+        a.t('String'===name.t)
+        a.t('Yamada'===name.v)
+        name.v = 'Suzuki'
+        a.t('Suzuki'===name.v) // 値は変更可(mutable:trueのため)
+        */
+    })();
+    /*
+    ;(function(){
+        const name = new Field('name', 'String', 'Yamada', false, true) // mutable
         a.t('n' in name)
         a.t('t' in name)
         a.t('v' in name)
@@ -41,6 +74,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
         name.v = 'Suzuki'
         a.t('Suzuki'===name.v) // 値は変更可(mutable:trueのため)
     })();
+    ;(function(){
+        const name = new Field('name', 'String', '', false, true) // nullable:falseなのにnullをセットしようとした
+        a.e(TypeError, `'name' is not nullable.`, ()=>name.v = null)
+    })();
+
     ;(function(){
         const name = new Field('name', 'String', 'Yamada')
         //a.t(Type.isIns(name, Field))
@@ -65,6 +103,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         name.v = 'Suzuki'
         a.t('Suzuki'===name.v)
     })();
+    */
     a.fin()
 });
 window.addEventListener('beforeunload', (event) => {

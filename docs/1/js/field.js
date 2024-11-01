@@ -10,8 +10,24 @@ class Field {
         this.#v = value
         return new Proxy(this, {
             get(t,k){
-                if ('n,t,v'.split(',').some(K=>K===k)) {return t[k]}
+                if (k in t) { return 'function'===typeof t[k] ? t[k].bind(t) : t[k] }
+                else { throw new TypeError(`'${k}' is invalid property name. valid name is 'n','t','v','m'.`) }
+                //if ('toString'===k) {return t.v[k].bind(t) }
+                /*    
+                if ('n,t,v,toString'.split(',').some(K=>K===k)) {return t[k]}
+                else if ('function'===typeof t[k])
                 throw new TypeError(`'${k}' is invalid property name. valid name is 'n','t','v','m'.`)
+                */
+                /*
+                if ('toString'===k) {return '' }
+                else if ('n,t,v'.split(',').some(K=>K===k)) {return t[k]}
+//                else if ('function'===typeof t[k])
+                throw new TypeError(`'${k}' is invalid property name. valid name is 'n','t','v','m'.`)
+                */
+            },
+            set(t,k,v){
+                if ('v'===k) {t[k] = v}
+                else {throw new TypeError(`Read only.`)}
             },
         })
 //        return Object.freeze(this)
@@ -38,6 +54,8 @@ class Field {
         } else {throw new TypeError(`'${this.#_.name}' is immutable.`)}
     }
     get m() { return this.#_.mutable }
+//    toString(...args) {return this.v.toString(...args)}
+//    valueOf(){return this.v}
     #valid(name, type, value, mutable=false, getter=null, setter=null) {
         if (!this.#validName(name)){throw new TypeError(`Invalid name.`)}
         if (!this.#validType(type)){throw new TypeError(`Invalid type.`)}
